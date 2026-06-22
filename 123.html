@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Илья-Беро | Марк или Влад на час</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0a0418;
+      min-height: 100vh;
+      color: #f0e6ff;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* ============ НАЧАЛЬНАЯ ЗАСТАВКА ============ */
+    .splash-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(ellipse at center, #1a0a35 0%, #07030f 100%);
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.9s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.9s;
+      visibility: visible;
+      opacity: 1;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .splash-screen.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .splash-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(3.5rem, 8vw, 6.5rem);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      background: linear-gradient(180deg, #e9d5ff 0%, #c084fc 40%, #8b5cf6 70%, #6d28d9 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 0 35px rgba(168, 85, 247, 0.8));
+      margin-bottom: 0.5rem;
+      animation: logoPulse 2.4s ease-in-out infinite;
+      text-align: center;
+      line-height: 1.1;
+    }
+
+    @keyframes logoPulse {
+      0%, 100% { filter: drop-shadow(0 0 30px rgba(168, 85, 247, 0.7)); }
+      50% { filter: drop-shadow(0 0 55px rgba(192, 132, 252, 0.95)); }
+    }
+
+    .splash-subtitle {
+      font-size: 1.25rem;
+      font-weight: 400;
+      letter-spacing: 0.5em;
+      color: #c9b0f0;
+      text-transform: uppercase;
+      margin-bottom: 2.8rem;
+      opacity: 0.85;
+      animation: fadeUpSub 1s ease-out;
+    }
+
+    @keyframes fadeUpSub {
+      0% { opacity: 0; transform: translateY(15px); }
+      100% { opacity: 0.85; transform: translateY(0); }
+    }
+
+    .splash-hint {
+      position: absolute;
+      bottom: 3.5rem;
+      font-size: 0.95rem;
+      color: #b79aed;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.6rem;
+      animation: bounceHint 2s infinite;
+    }
+
+    .splash-hint span {
+      font-size: 1.8rem;
+      filter: drop-shadow(0 0 10px #a855f7);
+    }
+
+    @keyframes bounceHint {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      background: #c084fc;
+      box-shadow: 0 0 20px #a855f7;
+      opacity: 0;
+      animation: floatUp 4s infinite;
+      pointer-events: none;
+    }
+
+    @keyframes floatUp {
+      0% { transform: translateY(0) scale(0.5); opacity: 0; }
+      20% { opacity: 0.7; }
+      80% { opacity: 0.5; }
+      100% { transform: translateY(-320px) scale(1.8); opacity: 0; }
+    }
+
+    /* ============ ОСНОВНОЙ САЙТ ============ */
+    .main-site {
+      position: relative;
+      z-index: 10;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.5rem;
+      background: radial-gradient(circle at 15% 20%, #2e1065 0%, #0a0418 65%);
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 1s ease 0.6s, transform 0.9s ease 0.6s;
+    }
+
+    .main-site.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .container {
+      max-width: 960px;
+      width: 100%;
+    }
+
+    /* Шапка */
+    .header {
+      text-align: center;
+      margin-bottom: 2.8rem;
+    }
+
+    .header h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.8rem, 6vw, 4.2rem);
+      font-weight: 700;
+      background: linear-gradient(135deg, #ede2ff, #c084fc, #9b72f2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: 0.02em;
+    }
+
+    .header p {
+      color: #c5b0e6;
+      font-size: 1.15rem;
+      font-weight: 400;
+      letter-spacing: 0.08em;
+      margin-top: 0.3rem;
+    }
+
+    /* Карточки выбора */
+    .choice-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+      margin-bottom: 2.8rem;
+    }
+
+    .person-card {
+      background: rgba(25, 12, 50, 0.55);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-radius: 2.8rem;
+      padding: 2.5rem 1.8rem 2rem;
+      border: 1px solid rgba(190, 140, 255, 0.3);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 25px rgba(139, 92, 246, 0.25);
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.45s cubic-bezier(0.25, 0.8, 0.25, 1.2);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .person-card:hover {
+      transform: translateY(-10px);
+      border-color: #c084fc;
+      box-shadow: 0 30px 55px rgba(147, 51, 234, 0.5), 0 0 50px rgba(168, 85, 247, 0.4);
+      background: rgba(40, 18, 70, 0.7);
+    }
+
+    .person-card.selected {
+      border: 2px solid #d8b4fe;
+      box-shadow: 0 0 55px rgba(168, 85, 247, 0.8), 0 25px 45px rgba(0,0,0,0.6);
+      background: rgba(50, 22, 85, 0.75);
+      transform: translateY(-12px) scale(1.02);
+    }
+
+    .person-card.selected::after {
+      content: "✓ ВЫБРАН";
+      position: absolute;
+      top: 1.2rem;
+      right: 1.2rem;
+      background: #a855f7;
+      color: white;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.35rem 1rem;
+      border-radius: 2rem;
+      letter-spacing: 0.08em;
+      box-shadow: 0 0 18px #a855f7;
+    }
+
+    .person-avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: linear-gradient(145deg, #4c1d95, #7e22ce);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3.8rem;
+      margin-bottom: 1.4rem;
+      box-shadow: 0 10px 30px rgba(168, 85, 247, 0.6);
+      border: 3px solid #d8b4fe;
+      transition: 0.3s;
+    }
+
+    .person-card:hover .person-avatar {
+      box-shadow: 0 15px 40px #a855f7;
+    }
+
+    .person-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.3rem;
+      font-weight: 700;
+      color: #f5edff;
+      margin-bottom: 0.3rem;
+    }
+
+    .person-desc {
+      color: #cdb5f0;
+      font-size: 0.95rem;
+      margin-bottom: 1.2rem;
+      line-height: 1.5;
+    }
+
+    .person-price {
+      background: rgba(139, 92, 246, 0.3);
+      border-radius: 2rem;
+      padding: 0.5rem 1.5rem;
+      font-weight: 700;
+      font-size: 1.4rem;
+      color: #f0e2ff;
+      border: 1px solid #c084fc;
+      margin-top: auto;
+    }
+
+    /* Форма заказа */
+    .order-section {
+      background: rgba(22, 10, 42, 0.6);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 3rem;
+      padding: 2.5rem 2.2rem;
+      border: 1px solid rgba(200, 160, 255, 0.3);
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+      transition: 0.3s;
+      margin-top: 1rem;
+    }
+
+    .order-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.9rem;
+      text-align: center;
+      margin-bottom: 2rem;
+      color: #e3d0ff;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.3rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .form-group.full {
+      grid-column: span 2;
+    }
+
+    label {
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: #cfb8f0;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-left: 0.4rem;
+    }
+
+    input, select {
+      background: rgba(30, 14, 55, 0.7);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(180, 130, 255, 0.4);
+      border-radius: 2.2rem;
+      padding: 0.95rem 1.5rem;
+      font-size: 1rem;
+      color: #f3eaff;
+      outline: none;
+      font-family: 'Inter', sans-serif;
+      transition: 0.3s;
+      box-shadow: inset 0 1px 4px rgba(0,0,0,0.3);
+    }
+
+    input::placeholder {
+      color: #9e86c7;
+      font-weight: 300;
+    }
+
+    input:focus, select:focus {
+      border-color: #d8b4fe;
+      box-shadow: 0 0 22px #a855f7, 0 0 0 3px rgba(168, 85, 247, 0.25);
+      background: rgba(45, 20, 75, 0.8);
+    }
+
+    .submit-btn {
+      grid-column: span 2;
+      background: linear-gradient(135deg, #7c3aed, #a855f7);
+      border: none;
+      color: white;
+      font-weight: 700;
+      font-size: 1.25rem;
+      padding: 1.1rem;
+      border-radius: 3rem;
+      margin-top: 0.8rem;
+      cursor: pointer;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      box-shadow: 0 14px 30px rgba(147, 51, 234, 0.7);
+      transition: 0.35s;
+      border: 1px solid #c084fc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .submit-btn:hover {
+      background: linear-gradient(135deg, #8b5cf6, #c084fc);
+      box-shadow: 0 22px 45px #7c3aed;
+      transform: translateY(-3px);
+    }
+
+    .footer-text {
+      text-align: center;
+      margin-top: 1.8rem;
+      color: #a78dd0;
+      font-size: 0.9rem;
+      letter-spacing: 0.04em;
+    }
+
+    @media (max-width: 650px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+      .form-group.full, .submit-btn {
+        grid-column: span 1;
+      }
+      .person-card {
+        padding: 2rem 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- ========== ЗАСТАВКА ========== -->
+  <div class="splash-screen" id="splashScreen">
+    <div class="splash-logo">Илья-Беро</div>
+    <div class="splash-subtitle">время выбирать</div>
+    <!-- Партиклы -->
+    <div id="particlesContainer"></div>
+    <div class="splash-hint">
+      <span>▼</span>
+      нажмите, чтобы войти
+    </div>
+  </div>
+
+  <!-- ========== ОСНОВНОЙ САЙТ ========== -->
+  <div class="main-site" id="mainSite">
+    <div class="container">
+      <div class="header">
+        <h1>Илья-Беро</h1>
+        <p>✦ выбери своего спутника на час ✦</p>
+      </div>
+
+      <!-- Карточки Марка и Влада -->
+      <div class="choice-grid">
+        <!-- Марк -->
+        <div class="person-card" id="cardMark" data-person="mark">
+          <div class="person-avatar">🕶️</div>
+          <div class="person-name">Марк</div>
+          <div class="person-desc">Харизма, стиль и лёгкая загадочность. Идеальный собеседник для особого вечера.</div>
+          <div class="person-price">4 990 ₽ / час</div>
+        </div>
+
+        <!-- Влад -->
+        <div class="person-card" id="cardVlad" data-person="vlad">
+          <div class="person-avatar">🧥</div>
+          <div class="person-name">Влад</div>
+          <div class="person-desc">Уверенность, глубокий взгляд и безупречные манеры. Время пролетит незаметно.</div>
+          <div class="person-price">5 490 ₽ / час</div>
+        </div>
+      </div>
+
+      <!-- Форма заказа -->
+      <div class="order-section" id="orderSection">
+        <div class="order-title">✨ оформить заказ ✨</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>🌟 Ваше имя</label>
+            <input type="text" id="clientName" placeholder="Александра" autocomplete="name">
+          </div>
+          <div class="form-group">
+            <label>📞 Телефон</label>
+            <input type="tel" id="clientPhone" placeholder="+7 999 123-45-67">
+          </div>
+          <div class="form-group">
+            <label>📧 Email</label>
+            <input type="email" id="clientEmail" placeholder="mail@example.com" autocomplete="email">
+          </div>
+          <div class="form-group">
+            <label>🕒 Время</label>
+            <select id="clientTime">
+              <option value="" disabled selected>Выберите время</option>
+              <option>10:00 – 11:00</option>
+              <option>12:00 – 13:00</option>
+              <option>14:00 – 15:00</option>
+              <option>16:00 – 17:00</option>
+              <option>18:00 – 19:00</option>
+              <option>20:00 – 21:00</option>
+              <option>21:00 – 22:00 (особый)</option>
+            </select>
+          </div>
+          <div class="form-group full" style="margin-top: 0.2rem;">
+            <label>💬 Пожелания (необязательно)</label>
+            <input type="text" id="clientNote" placeholder="Например: любит джаз и фиолетовый цвет">
+          </div>
+          <button class="submit-btn" id="submitOrderBtn">
+            <span>💜</span> Заказать <span id="selectedPersonText">Марка или Влада</span> <span>💜</span>
+          </button>
+        </div>
+        <div class="footer-text">конфиденциально · элегантно · илья-беро</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      // ========== ЗАСТАВКА ==========
+      const splash = document.getElementById('splashScreen');
+      const mainSite = document.getElementById('mainSite');
+      const particlesContainer = document.getElementById('particlesContainer');
+
+      // Генерация частиц на заставке
+      function createParticles() {
+        for (let i = 0; i < 35; i++) {
+          const particle = document.createElement('div');
+          particle.classList.add('particle');
+          const size = Math.random() * 8 + 4;
+          particle.style.width = size + 'px';
+          particle.style.height = size + 'px';
+          particle.style.left = Math.random() * 100 + '%';
+          particle.style.bottom = Math.random() * 40 + '%';
+          particle.style.animationDuration = (Math.random() * 5 + 3.5) + 's';
+          particle.style.animationDelay = Math.random() * 4 + 's';
+          particlesContainer.appendChild(particle);
+        }
+      }
+      createParticles();
+
+      // Клик по заставке — скрываем и показываем сайт
+      splash.addEventListener('click', function() {
+        splash.classList.add('hidden');
+        mainSite.classList.add('visible');
+        // Через время убираем заставку из DOM (опционально)
+        setTimeout(() => {
+          if (splash.parentNode) splash.style.display = 'none';
+        }, 1000);
+      });
+
+      // Также можно по нажатию клавиши Enter или пробел
+      window.addEventListener('keydown', function(e) {
+        if ((e.key === 'Enter' || e.key === ' ') && !splash.classList.contains('hidden')) {
+          e.preventDefault();
+          splash.click();
+        }
+      });
+
+      // ========== ЛОГИКА ВЫБОРА ПЕРСОНЫ ==========
+      const cardMark = document.getElementById('cardMark');
+      const cardVlad = document.getElementById('cardVlad');
+      const selectedPersonText = document.getElementById('selectedPersonText');
+      let selectedPerson = null; // 'mark' или 'vlad'
+
+      function selectPerson(person) {
+        // Снимаем выделение со всех
+        cardMark.classList.remove('selected');
+        cardVlad.classList.remove('selected');
+        
+        if (person === 'mark') {
+          cardMark.classList.add('selected');
+          selectedPerson = 'mark';
+          selectedPersonText.textContent = 'Марка';
+        } else if (person === 'vlad') {
+          cardVlad.classList.add('selected');
+          selectedPerson = 'vlad';
+          selectedPersonText.textContent = 'Влада';
+        }
+      }
+
+      cardMark.addEventListener('click', function() {
+        selectPerson('mark');
+      });
+
+      cardVlad.addEventListener('click', function() {
+        selectPerson('vlad');
+      });
+
+      // ========== ОТПРАВКА ФОРМЫ ==========
+      const submitBtn = document.getElementById('submitOrderBtn');
+      const nameInput = document.getElementById('clientName');
+      const phoneInput = document.getElementById('clientPhone');
+      const emailInput = document.getElementById('clientEmail');
+      const timeSelect = document.getElementById('clientTime');
+      const noteInput = document.getElementById('clientNote');
+
+      function showToast(message, isSuccess = true) {
+        const toast = document.createElement('div');
+        toast.textContent = message;
+        toast.style.position = 'fixed';
+        toast.style.bottom = '35px';
+        toast.style.left = '50%';
+        toast.style.transform = 'translateX(-50%)';
+        toast.style.background = isSuccess ? 'rgba(30, 10, 55, 0.92)' : 'rgba(80, 20, 40, 0.92)';
+        toast.style.backdropFilter = 'blur(18px)';
+        toast.style.color = '#f0e4ff';
+        toast.style.padding = '1.2rem 2.2rem';
+        toast.style.borderRadius = '4rem';
+        toast.style.fontWeight = '600';
+        toast.style.fontSize = '1rem';
+        toast.style.boxShadow = '0 0 35px #a855f7';
+        toast.style.border = '1px solid #d8b4fe';
+        toast.style.zIndex = '10000';
+        toast.style.textAlign = 'center';
+        toast.style.maxWidth = '92%';
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+          toast.style.transition = 'opacity 0.5s, transform 0.4s';
+          toast.style.opacity = '0';
+          toast.style.transform = 'translateX(-50%) translateY(15px)';
+          setTimeout(() => {
+            if (toast.parentNode) document.body.removeChild(toast);
+          }, 500);
+        }, 4200);
+      }
+
+      function validateAndSubmit() {
+        const name = nameInput.value.trim();
+        const phone = phoneInput.value.trim();
+        const email = emailInput.value.trim();
+        const time = timeSelect.value;
+
+        if (!selectedPerson) {
+          showToast('💜 Пожалуйста, выберите Марка или Влада', false);
+          return;
+        }
+
+        if (!name) {
+          showToast('🌟 Укажите ваше имя', false);
+          nameInput.focus();
+          return;
+        }
+        if (!phone || phone.length < 7) {
+          showToast('📞 Введите корректный номер телефона', false);
+          phoneInput.focus();
+          return;
+        }
+        if (!email || !email.includes('@') || !email.includes('.')) {
+          showToast('📧 Нужен правильный email', false);
+          emailInput.focus();
+          return;
+        }
+        if (!time) {
+          showToast('🕒 Выберите время встречи', false);
+          timeSelect.focus();
+          return;
+        }
+
+        const personName = selectedPerson === 'mark' ? 'Марк' : 'Влад';
+        const orderData = {
+          person: personName,
+          name,
+          phone,
+          email,
+          time,
+          note: noteInput.value.trim() || 'без пожеланий'
+        };
+
+        console.log('💜 Заказ Илья-Беро:', orderData);
+        
+        showToast(`🔮 ${name}, ${personName} ждёт вас в ${time}! Детали на почте.`);
+
+        // Сброс формы
+        nameInput.value = '';
+        phoneInput.value = '';
+        emailInput.value = '';
+        timeSelect.value = '';
+        noteInput.value = '';
+        cardMark.classList.remove('selected');
+        cardVlad.classList.remove('selected');
+        selectedPerson = null;
+        selectedPersonText.textContent = 'Марка или Влада';
+      }
+
+      submitBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        validateAndSubmit();
+      });
+
+      // Enter на последнем поле
+      const allInputs = [nameInput, phoneInput, emailInput, timeSelect, noteInput];
+      allInputs.forEach((input, idx) => {
+        input.addEventListener('keypress', function(e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            if (idx < allInputs.length - 1) {
+              allInputs[idx + 1].focus();
+            } else {
+              validateAndSubmit();
+            }
+          }
+        });
+      });
+
+      // Небольшая задержка для плавности (сайт появляется после заставки)
+      // Основной сайт изначально скрыт (opacity 0), visible добавляется при клике
+    })();
+  </script>
+</body>
+</html>
